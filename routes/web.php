@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get("/daily","App\Http\Controllers\UIController@daily")->name("ui.daily");
+Route::get("/weekly","App\Http\Controllers\UIController@weekly")->name("ui.weekly");
+Route::get("/monthly","App\Http\Controllers\UIController@monthly")->name("ui.monthly");
+Route::get("/percentages","App\Http\Controllers\UIController@percentages")->name("ui.percentages");
