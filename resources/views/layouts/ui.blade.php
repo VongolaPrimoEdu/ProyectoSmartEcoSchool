@@ -34,12 +34,13 @@
 	<main>
 			<img src="{{asset("img/icons/water.svg")}}" alt="Gota de agua">
 			<img src="{{asset("img/icons/lightning.svg")}}" alt="Rayo de electricidad">
-			<div>
-				<canvas id="consumo-agua"></canvas>
-			</div>
-			<div>
-				<canvas id="consumo-electricidad"></canvas>
-			</div>
+			<div><canvas id="consumo-agua"></canvas></div>
+			<div><canvas id="consumo-electricidad"></canvas></div>
 	</main>
+	<script type="module">
+		import  { drawElecChart,drawWaterChart }  from "./js/charts.js";
+		drawWaterChart(@yield("objwater"));
+		drawElecChart(@yield("objelec"));
+	</script>
 </body>
 </html>
