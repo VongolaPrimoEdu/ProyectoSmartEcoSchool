@@ -19,6 +19,9 @@ h1 {
 	margin-top: 1.5em;
 	grid-column: span 2;
 }
+h2 {
+	color: #666666;
+}
 /* Estilos de la línea de progreso */
 .swiper-container {
 	text-align: center;

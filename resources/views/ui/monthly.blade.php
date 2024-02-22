@@ -1,5 +1,6 @@
 @extends("layouts.ui")
-
+@section("title","Porcentaje de consumo mensual.")
+@section("subtitle","Gráficas que muestran la cantidad de agua y electricidad consumidas por cada mes del año.")
 @section("objwater")
 {
 	type: 'bar',

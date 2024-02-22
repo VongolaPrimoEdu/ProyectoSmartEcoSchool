@@ -42,5 +42,6 @@
 		drawWaterChart(@yield("objwater"));
 		drawElecChart(@yield("objelec"));
 	</script>
+	<h2>@yield("subtitle")</h2>
 </body>
 </html>

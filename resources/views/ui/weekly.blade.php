@@ -1,4 +1,6 @@
 @extends("layouts.ui")
+@section("title","Consumo semanal.")
+@section("subtitle","Gráficas que reflejan cuánta agua y electricidad han sido consumidas durante esta semana.")
 @section("objwater")
 {
 	type: 'line',
