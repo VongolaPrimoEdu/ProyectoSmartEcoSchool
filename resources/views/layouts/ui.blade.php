@@ -41,6 +41,7 @@
 		import  { drawElecChart,drawWaterChart }  from "./js/charts.js";
 		drawWaterChart(@yield("objwater"));
 		drawElecChart(@yield("objelec"));
+		setTimeout(() => location.href = "@yield("next-location")", @yield("time"));
 	</script>
 	<h2>@yield("subtitle")</h2>
 </body>

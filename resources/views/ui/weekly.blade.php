@@ -39,3 +39,5 @@
 	}
 }
 @endsection
+@section("next-location", route("ui.daily"))
+@section("time",20000)

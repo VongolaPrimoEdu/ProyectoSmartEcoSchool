@@ -61,3 +61,5 @@
 	}
 }
 @endsection
+@section("next-location", route("ui.weekly"))
+@section("time",20000)
