@@ -7,9 +7,13 @@
 		labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
 		datasets: [
 			{
-				data: [100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650],
+				data: [
+					@foreach ($consumo_por_mes as $consumo_mes)
+							{{$consumo_mes["agua"]}}
+					@endforeach	
+				],
 				backgroundColor: 'blue',
-                label: ""
+        label: ""
 			}
 		]
 	}
@@ -23,7 +27,11 @@
 		labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
 		datasets: [
 			{
-				data: [120, 170, 220, 270, 320, 370, 420, 470, 520, 570, 620, 670],
+				data: [
+					@foreach ($consumo_por_mes as $consumo_mes)
+							{{$consumo_mes["electricidad"]}}
+					@endforeach	
+				],
 				backgroundColor: 'yellow'
 			}
 		]

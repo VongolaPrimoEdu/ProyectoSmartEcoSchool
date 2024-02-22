@@ -11,7 +11,8 @@
 						{{$consumo_dia["agua"]}},
 					@endforeach
 				],
-				borderColor: 'blue'
+				borderColor: 'rgb(0,0,255)',
+				backgroundColor: 'rgba(0,0,255,0.5)'
 			}
 		]
 	}
@@ -29,7 +30,8 @@
 						{{$consumo_dia["electricidad"]}},
 					@endforeach
 				],
-				borderColor: 'yellow'
+				borderColor: 'rgb(143,143,0)',
+				backgroundColor: 'rgba(143,143,0,0.5)'
 			}
 		]
 	}
