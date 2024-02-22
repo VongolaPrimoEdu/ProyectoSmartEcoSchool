@@ -24,44 +24,52 @@ class UIController extends Controller
 	
 	private function getConsumoPorHora($id_tipo_sensor, $fecha)
 	{
-		$sensor_type_query = DB::select(DB::raw('SELECT id_sensor FROM sensors WHERE id_type=1'));
+		$sensor_type_query = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
 		$consumo_por_hora = DB::table('measurements')
-		->select(DB::raw("HOUR(fecha) as hora, consumo"))
-		->whereIn('id_sensor', collect(DB::select(DB::raw('SELECT id_sensor FROM sensors WHERE id_type=1')))->pluck('id_sensor')->toArray())
-		->where('DATE(fecha)', '=', "$fecha")
-		->get()->toArray();
+		->select(DB::raw("consumo"))
+		->whereIn('id_sensor', collect($sensor_type_query)->pluck('id_sensor')->toArray())
+		->whereRaw('DATE(fecha) = ?', [$fecha])
+		->orderByDesc('consumo')
+		->limit(1)
+		->pluck('consumo')
+		->get(0);
 		return $consumo_por_hora;
 	}
 	
     public function weekly()
 {
+		//Código para representar días ficticios. Eliminar cuando no haga falta.
+		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
+		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
+		$fecha_aleatoria = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
+
     // Obtener la fecha actual
-    $fecha_actual = Carbon::now();
+    // $fecha_actual = Carbon::now();
 
     // Arreglo para almacenar los datos de consumo por día de la semana
     $consumo_por_dia = [];
-
+		//la fecha es 2020-04-16
     // Recorrer los últimos 7 días
-    for ($i = 0; $i < 7; $i++) {
+    for ($i = 7; $i > 0; $i--) {
         // Obtener la fecha para el día actual menos $i días
-        $fecha = $fecha_actual->subDays($i)->toDateString();
+				$fecha_reducida = $fecha_aleatoria->copy()->subDays($i);
+        $fecha = $fecha_reducida->toDateString();
 
         // Obtener los datos de consumo por hora para esa fecha
         $consumo_por_hora_electricidad = $this->getConsumoPorHora(1, $fecha); // Tipo de sensor para electricidad: 1
         $consumo_por_hora_agua = $this->getConsumoPorHora(2, $fecha); // Tipo de sensor para agua: 2
 
         // Sumar el consumo total por hora para obtener el consumo diario
-        $consumo_diario_electricidad = array_sum($consumo_por_hora_electricidad);
-        $consumo_diario_agua = array_sum($consumo_por_hora_agua);
+        $consumo_diario_electricidad = $consumo_por_hora_electricidad;
+        $consumo_diario_agua = $consumo_por_hora_agua;
 
         // Almacenar los datos en el arreglo por día de la semana
-        $dia_semana = $fecha_actual->dayName;
+        $dia_semana = $fecha_reducida->dayName;
         $consumo_por_dia[$dia_semana] = [
             'electricidad' => $consumo_diario_electricidad,
             'agua' => $consumo_diario_agua,
         ];
     }
-
     return view('ui.weekly', compact('consumo_por_dia'));
 }
     public function monthly()

@@ -4,10 +4,14 @@
 	type: 'line',
 	data: {
 		labels: ['L','M','X','J','V','S','D'],
-		datasets [
+		datasets: [
 			{
-				data: [100,150,200,250,300,350,400],
-				borderColor: blue
+				data: [
+					@foreach ($consumo_por_dia as $consumo_dia)
+						{{$consumo_dia["agua"]}},
+					@endforeach
+				],
+				borderColor: 'blue'
 			}
 		]
 	}
@@ -18,10 +22,14 @@
 	type: 'line',
 	data: {
 		labels: ['L','M','X','J','V','S','D'],
-		datasets [
+		datasets: [
 			{
-				data: [100,150,200,250,300,350,400],
-				borderColor: yellow
+				data: [
+					@foreach ($consumo_por_dia as $consumo_dia)
+						{{$consumo_dia["electricidad"]}},
+					@endforeach
+				],
+				borderColor: 'yellow'
 			}
 		]
 	}
