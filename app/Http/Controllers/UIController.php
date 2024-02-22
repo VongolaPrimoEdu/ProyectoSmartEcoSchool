@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Measurement;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class UIController extends Controller
 {
@@ -16,18 +19,17 @@ class UIController extends Controller
 		$consumo_por_hora_electricidad = $this->getConsumoPorHora(1, $fecha); // Tipo de sensor para electricidad: 1
 		$consumo_por_hora_agua = $this->getConsumoPorHora(2, $fecha); // Tipo de sensor para agua: 2
 	
-		return view('daily', compact('consumo_por_hora_electricidad', 'consumo_por_hora_agua'));
+		return view('ui.daily', compact('consumo_por_hora_electricidad', 'consumo_por_hora_agua'));
 	}
 	
 	private function getConsumoPorHora($id_tipo_sensor, $fecha)
 	{
-		$consumo_por_hora = Measurement::whereHas('sensor', function ($query) use ($id_tipo_sensor) {
-			$query->where('id_type', '=', $id_tipo_sensor);
-		})->whereDate('fecha', $fecha)
-		  ->select(DB::raw('HOUR(fecha) as hora'), DB::raw('SUM(consumo) as consumo'))
-		  ->groupBy(DB::raw('HOUR(fecha)'))
-		  ->pluck('consumo', 'hora');
-	
+		$sensor_type_query = DB::select(DB::raw('SELECT id_sensor FROM sensors WHERE id_type=1'));
+		$consumo_por_hora = DB::table('measurements')
+		->select(DB::raw("HOUR(fecha) as hora, consumo"))
+		->whereIn('id_sensor', collect(DB::select(DB::raw('SELECT id_sensor FROM sensors WHERE id_type=1')))->pluck('id_sensor')->toArray())
+		->where('DATE(fecha)', '=', "$fecha")
+		->get()->toArray();
 		return $consumo_por_hora;
 	}
 	
@@ -60,7 +62,7 @@ class UIController extends Controller
         ];
     }
 
-    return view('weekly', compact('consumo_por_dia'));
+    return view('ui.weekly', compact('consumo_por_dia'));
 }
     public function monthly()
 		{
@@ -72,7 +74,7 @@ class UIController extends Controller
    $consumo_total_electricidad = $this->getConsumoTotal(1, $anio_actual, $mes_actual); // Tipo de sensor para electricidad: 1
    $consumo_total_agua = $this->getConsumoTotal(2, $anio_actual, $mes_actual); // Tipo de sensor para agua: 2
 
-   return view('monthly', compact('consumo_total_electricidad', 'consumo_total_agua'));
+   return view('ui.monthly', compact('consumo_total_electricidad', 'consumo_total_agua'));
 }
 
 private function getConsumoTotal($id_tipo_sensor, $anio, $mes)
@@ -118,7 +120,7 @@ private function getConsumoTotal($id_tipo_sensor, $anio, $mes)
 			  ];
 		  }
 	  
-		  return view('percentage', compact('porcentajes'));
+		  return view('ui.percentage', compact('porcentajes'));
 	  }
 	  
 	  private function getConsumoTotalPercentage($id_tipo_sensor, $fecha)
