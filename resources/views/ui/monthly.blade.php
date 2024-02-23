@@ -10,7 +10,7 @@
 			{
 				data: [
 					@foreach ($consumo_por_mes as $consumo_mes)
-							{{$consumo_mes["agua"]}}
+							{{$consumo_mes["agua"]}},
 					@endforeach	
 				],
 				backgroundColor: 'blue',
@@ -30,13 +30,15 @@
 			{
 				data: [
 					@foreach ($consumo_por_mes as $consumo_mes)
-							{{$consumo_mes["electricidad"]}}
+							{{$consumo_mes["electricidad"]}},
 					@endforeach	
 				],
-				backgroundColor: 'yellow'
+				backgroundColor: 'rgb(143,143,0)'
 			}
 		]
 	}
 }
 @endsection
+@section("next-location", route("ui.daily"))
+@section("time",20000)
 @section("viewforimage","monthly")
