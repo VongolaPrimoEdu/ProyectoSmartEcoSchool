@@ -41,3 +41,4 @@
 @endsection
 @section("next-location", route("ui.daily"))
 @section("time",20000)
+@section("viewforimage","weekly")

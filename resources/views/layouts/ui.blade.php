@@ -14,17 +14,16 @@
 		<div class="swiper-container">
 			<p>CONSUMO</p>
 			<div class="swiper-wrapper">
-				<div class="swiper-slide">
+				<div class="swiper-slide" id="daily">
 					<p class="consume-type">DIARIO</p>
-					{{-- <img src="{{asset("img/icons/arrow.svg")}}" alt="" style="width:20%;"> --}}
 				</div>
-				<div class="swiper-slide">
+				<div class="swiper-slide" id="weekly">
 					<p class="consume-type">SEMANAL</p>
 				</div>
-				<div class="swiper-slide">
+				<div class="swiper-slide" id="monthly">
 					<p class="consume-type">MENSUAL</p>
 				</div>
-				<div class="swiper-slide">
+				<div class="swiper-slide" id="percentages">
 					<p class="consume-type">PORCENTAJES</p>
 				</div>
 			</div>
@@ -32,8 +31,8 @@
 		<h1>@yield("title")</h1>
 	</header>
 	<main>
-			<img src="{{asset("img/icons/water.svg")}}" alt="Gota de agua">
-			<img src="{{asset("img/icons/lightning.svg")}}" alt="Rayo de electricidad">
+			<img src="{{asset("img/icons/water.svg")}}" class="icon" alt="Gota de agua">
+			<img src="{{asset("img/icons/lightning.svg")}}" class="icon" alt="Rayo de electricidad">
 			<div><canvas id="consumo-agua"></canvas></div>
 			<div><canvas id="consumo-electricidad"></canvas></div>
 	</main>
@@ -42,6 +41,8 @@
 		drawWaterChart(@yield("objwater"));
 		drawElecChart(@yield("objelec"));
 		setTimeout(() => location.href = "@yield("next-location")", @yield("time"));
+		document.getElementById("@yield("viewforimage")").insertAdjacentHTML("beforeend",
+		"<img src='{{asset('img/icons/arrow.svg')}}' id='arrow' alt='Flecha apuntando hacia arriba'>");
 	</script>
 	<h2>@yield("subtitle")</h2>
 </body>

@@ -39,3 +39,4 @@
 	}
 }
 @endsection
+@section("viewforimage","monthly")

@@ -65,11 +65,14 @@ main {
 main > * {
 	margin: 0 auto;
 }
-/* Iconos de agua y electricidad */
-main > img {
+/* Iconos de color negro */
+.icon {
 	width: 10%;
+}
+#arrow {
+	width: 20%;
 }
 /* Gráficas */
 main > div {
-	width: 75%;
+	width: 65%;
 }

@@ -5,3 +5,4 @@
 @endsection
 @section("objelec")
 @endsection
+@section("viewforimage","percentages")
