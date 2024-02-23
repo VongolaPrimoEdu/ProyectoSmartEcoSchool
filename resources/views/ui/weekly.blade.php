@@ -39,6 +39,6 @@
 	}
 }
 @endsection
-@section("next-location", route("ui.daily"))
+@section("next-location", route("ui.monthly"))
 @section("time",20000)
 @section("viewforimage","weekly")
