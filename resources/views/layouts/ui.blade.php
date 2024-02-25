@@ -23,8 +23,8 @@
 				<div class="swiper-slide" id="monthly">
 					<p class="consume-type">MENSUAL</p>
 				</div>
-				<div class="swiper-slide" id="percentages">
-					<p class="consume-type">PORCENTAJES</p>
+				<div class="swiper-slide" id="currentday">
+					<p class="consume-type">DÍA ACTUAL</p>
 				</div>
 			</div>
 		</div>

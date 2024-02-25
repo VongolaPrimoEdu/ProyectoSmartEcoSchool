@@ -87,38 +87,38 @@ class UIController extends Controller
    return view('ui.monthly', compact('consumo_por_mes'));
 	}
   
-	public function percentages()
+	public function current_day()
 	{
-		// Obtener fecha.
-		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
-		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
-		$fecha = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
-		//Consumo de la semana actual.
-		$consumo_actual_electricidad = $this->getConsumoTotalSemana(1, $fecha->toDateString()); // Tipo de sensor para electricidad: 1
-		$consumo_actual_agua = $this->getConsumoTotalSemana(2, $fecha->toDateString()); // Tipo de sensor para agua: 2
-		// Arreglo para almacenar los porcentajes de aumento o disminución por semana.
-		$porcentajes = [];
-		// Recorrer las 5 semanas previas a la semana anterior.
-		for ($i = 6; $i >= 2; $i--) {
-			// Obtener la fecha para el día actual menos 7*$i días
-			$fecha_previa = $fecha->copy()->subDays(7*$i)->toDateString();
-			// Obtener el consumo por hora para la semana actual y la semana anterior.
-			$consumo_anterior_electricidad = $this->getConsumoTotalSemana(1, $fecha->addDay()->toDateString());
-			$consumo_anterior_agua = $this->getConsumoTotalSemana(2, $fecha->addDay()->toDateString());
+		// // Obtener fecha.
+		// $inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
+		// $final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
+		// $fecha = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
+		// //Consumo de la semana actual.
+		// $consumo_actual_electricidad = $this->getConsumoTotalSemana(1, $fecha->toDateString()); // Tipo de sensor para electricidad: 1
+		// $consumo_actual_agua = $this->getConsumoTotalSemana(2, $fecha->toDateString()); // Tipo de sensor para agua: 2
+		// // Arreglo para almacenar los porcentajes de aumento o disminución por semana.
+		// $porcentajes = [];
+		// // Recorrer las 5 semanas previas a la semana anterior.
+		// for ($i = 6; $i >= 2; $i--) {
+		// 	// Obtener la fecha para el día actual menos 7*$i días
+		// 	$fecha_previa = $fecha->copy()->subDays(7*$i)->toDateString();
+		// 	// Obtener el consumo por hora para la semana actual y la semana anterior.
+		// 	$consumo_anterior_electricidad = $this->getConsumoTotalSemana(1, $fecha->addDay()->toDateString());
+		// 	$consumo_anterior_agua = $this->getConsumoTotalSemana(2, $fecha->addDay()->toDateString());
 	
-			// Calcular el porcentaje de aumento o disminución de consumo respecto al día anterior
-			$porcentaje_electricidad = $this->calcularPorcentaje($consumo_actual_electricidad, $consumo_anterior_electricidad);
-			$porcentaje_agua = $this->calcularPorcentaje($consumo_actual_agua, $consumo_anterior_agua);
+		// 	// Calcular el porcentaje de aumento o disminución de consumo respecto al día anterior
+		// 	$porcentaje_electricidad = $this->calcularPorcentaje($consumo_actual_electricidad, $consumo_anterior_electricidad);
+		// 	$porcentaje_agua = $this->calcularPorcentaje($consumo_actual_agua, $consumo_anterior_agua);
 	
-			// Almacenar el porcentaje en el arreglo por día
-			$dia_semana = $fecha->dayName;
-			$porcentajes[$dia_semana] = [
-				'electricidad' => $porcentaje_electricidad,
-				'agua' => $porcentaje_agua,
-			];
-		}
+		// 	// Almacenar el porcentaje en el arreglo por día
+		// 	$dia_semana = $fecha->dayName;
+		// 	$porcentajes[$dia_semana] = [
+		// 		'electricidad' => $porcentaje_electricidad,
+		// 		'agua' => $porcentaje_agua,
+		// 	];
+		// }
 	
-		return view('ui.percentages', compact('porcentajes'));
+		// return view('ui.currentday', compact('porcentajes'));
 	}
 
 	  

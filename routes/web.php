@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 Route::get("/daily","App\Http\Controllers\UIController@daily")->name("ui.daily");
 Route::get("/weekly","App\Http\Controllers\UIController@weekly")->name("ui.weekly");
 Route::get("/monthly","App\Http\Controllers\UIController@monthly")->name("ui.monthly");
-Route::get("/percentages","App\Http\Controllers\UIController@percentages")->name("ui.percentages");
+Route::get("/currentday","App\Http\Controllers\UIController@current_day")->name("ui.currentday");
