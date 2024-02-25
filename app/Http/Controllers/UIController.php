@@ -93,17 +93,17 @@ class UIController extends Controller
 		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
 		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
 		$fecha = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
+		//Consumo de la semana actual.
+		$consumo_actual_electricidad = $this->getConsumoTotalSemana(1, $fecha->toDateString()); // Tipo de sensor para electricidad: 1
+		$consumo_actual_agua = $this->getConsumoTotalSemana(2, $fecha->toDateString()); // Tipo de sensor para agua: 2
 		// Arreglo para almacenar los porcentajes de aumento o disminución por semana.
 		$porcentajes = [];
 		// Recorrer las 5 semanas previas a la semana anterior.
-		for ($i = 2; $i <= 6; $i--) {
+		for ($i = 6; $i >= 2; $i--) {
 			// Obtener la fecha para el día actual menos 7*$i días
-			$fecha_previa = $fecha->copy()->subDays($i)->toDateString();
+			$fecha_previa = $fecha->copy()->subDays(7*$i)->toDateString();
 			// Obtener el consumo por hora para la semana actual y la semana anterior.
-			$consumo_actual_electricidad = $this->getConsumoTotalSemana(1, $fecha->toDateString()); // Tipo de sensor para electricidad: 1
 			$consumo_anterior_electricidad = $this->getConsumoTotalSemana(1, $fecha->addDay()->toDateString());
-	
-			$consumo_actual_agua = $this->getConsumoTotalSemana(2, $fecha_previa); // Tipo de sensor para agua: 2
 			$consumo_anterior_agua = $this->getConsumoTotalSemana(2, $fecha->addDay()->toDateString());
 	
 			// Calcular el porcentaje de aumento o disminución de consumo respecto al día anterior
@@ -149,13 +149,14 @@ class UIController extends Controller
 
 	private function getConsumoTotalSemana($id_tipo_sensor, $fecha)
 	{
-		$consumo_semanal = DB::select("
-			SELECT SUM(m.consumo)
-			FROM measurements AS m
-			INNER JOIN sensors AS s ON m.id_sensor = s.id_sensor
-			WHERE s.id_type = $id_tipo_sensor
-			AND DATE(m.fecha) BETWEEN DATE_SUB($fecha, INTERVAL 1 WEEK) AND $fecha"
-		);
+		$date = date_create($fecha);
+		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
+		$consumo_semanal = DB::table('measurements')
+		->select(DB::raw('SUM(consumo)'))
+		->whereIn('id_sensor', collect($sensor_type)->pluck('id_sensor')->toArray())
+		->whereBetween("fecha",[date_diff($date, ), $fecha])
+		->pluck('SUM(consumo)')
+		->toArray()[0];
 		return $consumo_semanal;
 	}
 
