@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class UIController extends Controller
 {
+	private $fecha_aleatoria;
+	
+	public function __construct() {
+		$this->fecha_aleatoria = Carbon::create(2020, 2, 10);
+	}
+
 	public function daily()
 	{
 
@@ -17,11 +23,6 @@ class UIController extends Controller
 	
   public function weekly()
 	{	
-		//Código para representar días ficticios. Eliminar cuando no haga falta.
-		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
-		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
-		$fecha_aleatoria = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
-
     // Obtener la fecha actual
     // $fecha_actual = Carbon::now();
 
@@ -31,7 +32,7 @@ class UIController extends Controller
     // Recorrer los últimos 7 días
     for ($i = 7; $i > 0; $i--) {
         // Obtener la fecha para el día actual menos $i días
-				$fecha_reducida = $fecha_aleatoria->copy()->subDays($i);
+				$fecha_reducida = $this->fecha_aleatoria->copy()->subDays($i);
         $fecha = $fecha_reducida->toDateString();
 
         // Obtener los datos de consumo por hora para esa fecha
@@ -84,13 +85,7 @@ class UIController extends Controller
 	
   public function monthly()
 	{
-		//Iteramos por el año y mientras haya meses, seguimos registrando en el array.
-		
-   	// Obtener el año y mes actual
-		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
-		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
-		$fecha_aleatoria = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
-		$anio = $fecha_aleatoria->year;
+		$anio = $this->fecha_aleatoria->year;
 		$meses = $meses = DB::table('measurements')
             ->select(DB::raw('DISTINCT MONTH(fecha) as month'))
             ->whereYear('fecha', $anio)
@@ -111,13 +106,9 @@ class UIController extends Controller
   
 	public function current_day()
 	{
-		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
-		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
-		$fecha_aleatoria = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp))->toDateString();
-	
 		// Obtener las medidas de consumo de electricidad y agua para el día actual
-		$consumo_por_hora_electricidad = $this->getConsumoPorHora(1, $fecha_aleatoria); // Tipo de sensor para electricidad: 1
-		$consumo_por_hora_agua = $this->getConsumoPorHora(2, $fecha_aleatoria); // Tipo de sensor para agua: 2
+		$consumo_por_hora_electricidad = $this->getConsumoPorHora(1, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para electricidad: 1
+		$consumo_por_hora_agua = $this->getConsumoPorHora(2, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para agua: 2
 		return view('ui.currentday', compact('consumo_por_hora_electricidad', 'consumo_por_hora_agua'));
 	}
 
