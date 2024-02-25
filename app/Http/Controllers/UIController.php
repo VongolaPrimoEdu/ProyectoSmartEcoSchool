@@ -12,15 +12,7 @@ class UIController extends Controller
 {
 	public function daily()
 	{
-		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
-		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
-		$fecha_aleatoria = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp))->toDateString();
-	
-		// Obtener las medidas de consumo de electricidad y agua para el día actual
-		$consumo_por_hora_electricidad = $this->getConsumoPorHora(1, $fecha_aleatoria); // Tipo de sensor para electricidad: 1
-		$consumo_por_hora_agua = $this->getConsumoPorHora(2, $fecha_aleatoria); // Tipo de sensor para agua: 2
-	
-		return view('ui.daily', compact('consumo_por_hora_electricidad', 'consumo_por_hora_agua'));
+
 	}
 	
   public function weekly()
@@ -58,37 +50,6 @@ class UIController extends Controller
         ];
     }
     return view('ui.weekly', compact('consumo_por_dia'));
-	}
-	
-  public function monthly()
-	{
-		//Iteramos por el año y mientras haya meses, seguimos registrando en el array.
-		
-   	// Obtener el año y mes actual
-		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
-		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
-		$fecha_aleatoria = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
-		$anio = $fecha_aleatoria->year;
-		$meses = $meses = DB::table('measurements')
-            ->select(DB::raw('DISTINCT MONTH(fecha) as month'))
-            ->whereYear('fecha', $anio)
-            ->orderBy('month')
-            ->pluck('month');
-
-		foreach ($meses as $mes) {
-			// Obtener el consumo total de electricidad y agua para el mes actual
-			$consumo_total_electricidad = $this->getConsumoTotal(1, $anio, $mes); // Tipo de sensor para electricidad: 1
-			$consumo_total_agua = $this->getConsumoTotal(2, $anio, $mes); // Tipo de sensor para agua: 2
-			$consumo_por_mes[$mes - 1] = [
-				'electricidad' => $consumo_total_electricidad,
-				'agua' => $consumo_total_agua
-			];
-		}
-   return view('ui.monthly', compact('consumo_por_mes'));
-	}
-  
-	public function current_day()
-	{
 		// // Obtener fecha.
 		// $inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
 		// $final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
@@ -120,6 +81,45 @@ class UIController extends Controller
 	
 		// return view('ui.currentday', compact('porcentajes'));
 	}
+	
+  public function monthly()
+	{
+		//Iteramos por el año y mientras haya meses, seguimos registrando en el array.
+		
+   	// Obtener el año y mes actual
+		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
+		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
+		$fecha_aleatoria = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
+		$anio = $fecha_aleatoria->year;
+		$meses = $meses = DB::table('measurements')
+            ->select(DB::raw('DISTINCT MONTH(fecha) as month'))
+            ->whereYear('fecha', $anio)
+            ->orderBy('month')
+            ->pluck('month');
+
+		foreach ($meses as $mes) {
+			// Obtener el consumo total de electricidad y agua para el mes actual
+			$consumo_total_electricidad = $this->getConsumoTotal(1, $anio, $mes); // Tipo de sensor para electricidad: 1
+			$consumo_total_agua = $this->getConsumoTotal(2, $anio, $mes); // Tipo de sensor para agua: 2
+			$consumo_por_mes[$mes - 1] = [
+				'electricidad' => $consumo_total_electricidad,
+				'agua' => $consumo_total_agua
+			];
+		}
+   return view('ui.monthly', compact('consumo_por_mes'));
+	}
+  
+	public function current_day()
+	{
+		$inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
+		$final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
+		$fecha_aleatoria = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp))->toDateString();
+	
+		// Obtener las medidas de consumo de electricidad y agua para el día actual
+		$consumo_por_hora_electricidad = $this->getConsumoPorHora(1, $fecha_aleatoria); // Tipo de sensor para electricidad: 1
+		$consumo_por_hora_agua = $this->getConsumoPorHora(2, $fecha_aleatoria); // Tipo de sensor para agua: 2
+		return view('ui.currentday', compact('consumo_por_hora_electricidad', 'consumo_por_hora_agua'));
+	}
 
 	  
 	private function getConsumoPorHora($id_tipo_sensor, $fecha)
@@ -129,7 +129,13 @@ class UIController extends Controller
 		->select(DB::raw("consumo"))
 		->whereIn('id_sensor', collect($sensor_type)->pluck('id_sensor')->toArray())
 		->whereRaw('DATE(fecha) = ?', [$fecha])
-		->pluck("consumo");
+		->orderBy("consumo")
+		->pluck("consumo")
+		->toArray();
+		$consumo_inicial = $consumo_por_hora[0];
+		for ($i = 0; $i < sizeof($consumo_por_hora); $i++){
+			$consumo_por_hora[$i] -= $consumo_inicial;
+		}
 		return $consumo_por_hora;
 	}
 

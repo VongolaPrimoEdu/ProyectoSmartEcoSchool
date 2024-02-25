@@ -40,7 +40,7 @@
 		import  { drawElecChart,drawWaterChart }  from "./js/charts.js";
 		drawWaterChart(@yield("objwater"));
 		drawElecChart(@yield("objelec"));
-	  setTimeout(() => location.href = "@yield("next-location")", @yield("time"));
+	  // setTimeout(() => location.href = "@yield("next-location")", @yield("time"));
 		document.getElementById("@yield("viewforimage")").insertAdjacentHTML("beforeend",
 		"<img src='{{asset('img/icons/arrow.svg')}}' id='arrow' alt='Flecha apuntando hacia arriba'>");
 	</script>
