@@ -28,6 +28,7 @@
 		labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
 		datasets: [
 			{
+				label: "",
 				data: [
 					@foreach ($consumo_por_mes as $consumo_mes)
 							{{$consumo_mes["electricidad"]}},
