@@ -16,7 +16,7 @@ header {
 }
 /* Título principal */
 h1 {
-	margin-top: 1.5em;
+	margin-top: -0.2em;
 	grid-column: span 2;
 }
 h2 {
@@ -67,12 +67,12 @@ main > * {
 }
 /* Iconos de color negro */
 .icon {
-	width: 10%;
+	width: 8%;
 }
 #arrow {
 	width: 20%;
 }
 /* Gráficas */
 main > div {
-	width: 65%;
+	width: 80%;
 }
