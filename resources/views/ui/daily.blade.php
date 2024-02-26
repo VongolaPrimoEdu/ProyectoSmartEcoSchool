@@ -1,11 +1,11 @@
 @extends("layouts.ui")
 @section("title","Consumo diario.")
-@section("subtitle","Gráficas que reflejan cuánta agua y electricidad han sido consumidas durante este día con respecto a los 7 días anteriores.")
+@section("subtitle","Gráficas que reflejan cuánto ha sido consumido durante este día con respecto a los 7 días anteriores.")
 @section("objwater")
 {
 	type: 'line',
 	data: {
-		labels: ['L','M','X','J','V','S','D'],
+		labels: ['Hace 7 días','Hace 6 días','Hace 5 días','Hace 4 días','Hace 3 días','Hace 2 días','Hace 1 día'],
 		datasets: [
 			{
 				label: "",
@@ -25,7 +25,7 @@
 {
 	type: 'line',
 	data: {
-		labels: ['L','M','X','J','V','S','D'],
+		labels: ['Hace 7 días','Hace 6 días','Hace 5 días','Hace 4 días','Hace 3 días','Hace 2 días','Hace 1 día'],
 		datasets: [
 			{
 				label: "",

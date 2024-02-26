@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Plantilla de UI de Smartecoschool</title>
+	<title>UI de Smartecoschool</title>
 	<link rel="stylesheet" href="{{asset("css/app.css")}}">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -14,6 +14,9 @@
 		<div class="swiper-container">
 			<p>CONSUMO</p>
 			<div class="swiper-wrapper">
+				<div class="swiper-slide" id="currentday">
+					<p class="consume-type">DÍA ACTUAL</p>
+				</div>
 				<div class="swiper-slide" id="daily">
 					<p class="consume-type">DIARIO</p>
 				</div>
@@ -22,9 +25,6 @@
 				</div>
 				<div class="swiper-slide" id="monthly">
 					<p class="consume-type">MENSUAL</p>
-				</div>
-				<div class="swiper-slide" id="currentday">
-					<p class="consume-type">DÍA ACTUAL</p>
 				</div>
 			</div>
 		</div>

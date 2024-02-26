@@ -11,6 +11,7 @@
 		],
 		datasets: [
 			{
+				label: '',
 				data: [
 					@foreach ($consumo_por_hora_agua as $consumo_hora_agua)
 						{{$consumo_hora_agua}},
@@ -41,6 +42,7 @@
 		],
 		datasets: [
 			{
+				label: '',
 				data: [
 					@foreach ($consumo_por_hora_electricidad as $consumo_hora_elec)
 						{{$consumo_hora_elec}},
@@ -61,6 +63,6 @@
 	}
 }
 @endsection
-@section("next-location",route("ui.monthly"))
+@section("next-location",route("ui.daily"))
 @section("time",20000)
 @section("viewforimage","currentday")
