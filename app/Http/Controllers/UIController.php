@@ -47,35 +47,33 @@ class UIController extends Controller
 	
   public function weekly()
 	{
-		// // Obtener fecha.
-		// $inicio_2020 = Carbon::create(2020, 2, 1); // 1 de enero de 2020
-		// $final_2020 = Carbon::create(2020, 7, 31);   // 31 de julio de 2020
-		// $fecha = Carbon::createFromTimestamp(mt_rand($inicio_2020->timestamp,$final_2020->timestamp));
-		// //Consumo de la semana actual.
-		// $consumo_actual_electricidad = $this->getConsumoDeLaSemana(1, $fecha->toDateString()); // Tipo de sensor para electricidad: 1
-		// $consumo_actual_agua = $this->getConsumoDeLaSemana(2, $fecha->toDateString()); // Tipo de sensor para agua: 2
-		// // Arreglo para almacenar los porcentajes de aumento o disminución por semana.
-		// $porcentajes = [];
-		// // Recorrer las 5 semanas previas a la semana anterior.
-		// for ($i = 6; $i >= 2; $i--) {
-		// 	// Obtener la fecha para el día actual menos 7*$i días
-		// 	$fecha_previa = $fecha->copy()->subDays(7*$i)->toDateString();
-		// 	// Obtener el consumo por hora para la semana actual y la semana anterior.
-		// 	$consumo_anterior_electricidad = $this->getConsumoDeLaSemana(1, $fecha->addDay()->toDateString());
-		// 	$consumo_anterior_agua = $this->getConsumoDeLaSemana(2, $fecha->addDay()->toDateString());
-	
-		// 	// Calcular el porcentaje de aumento o disminución de consumo respecto al día anterior
-		// 	$porcentaje_electricidad = $this->calcularPorcentaje($consumo_actual_electricidad, $consumo_anterior_electricidad);
-		// 	$porcentaje_agua = $this->calcularPorcentaje($consumo_actual_agua, $consumo_anterior_agua);
-	
-		// 	// Almacenar el porcentaje en el arreglo por día
-		// 	$dia_semana = $fecha->dayName;
-		// 	$porcentajes[$dia_semana] = [
-		// 		'electricidad' => $porcentaje_electricidad,
-		// 		'agua' => $porcentaje_agua,
-		// 	];
-		// }
-		// return view('ui.currentday', compact('porcentajes'));
+		//Consumo de la semana actual.
+		$consumo_actual_electricidad = $this->getConsumoDeLaSemana(1, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para electricidad: 1
+		$consumo_actual_agua = $this->getConsumoDeLaSemana(2, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para agua: 2
+		//Recoge el último domingo para partir de ahí en la comparación semanal.
+		$fecha_inicial_comparacion = DB::select("SELECT MAX(DATE(fecha)) as fecha FROM measurements
+		WHERE fecha < ? AND DAYOFWEEK(fecha) = 1", [$this->fecha_aleatoria])[0]->fecha;
+		//Recoge el año, el mes y el día para incluirlos en un objeto Carbon que nos permita substraer días cómodamente.
+		$componentes_fecha = explode("-",$fecha_inicial_comparacion);
+		$anio = $componentes_fecha[0];
+		$mes = $componentes_fecha[1];
+		$dia = $componentes_fecha[2];
+		$fecha_inicial = Carbon::create($anio, $mes, $dia, 23, 0);
+		// Recorrer las 5 semanas previas a la semana anterior.
+		for ($i = 4; $i >= 0; $i--) {
+			// Obtener la fecha para el día actual menos 7*$i días
+			$fecha_previa = $fecha_inicial->copy()->subDays(7*$i);
+			// Obtener el consumo de la fecha previa con respecto a la actual.
+			$consumo_comparativo_electricidad = $consumo_actual_electricidad - $this->getConsumoDeLaSemana(1, $fecha_previa->toDateString());
+			$consumo_comparativo_agua = $consumo_actual_agua - $this->getConsumoDeLaSemana(2, $fecha_previa->toDateString());
+			// Almacenar el consumo en el arreglo por día
+			$dia_semana = $fecha_previa->dayName;
+			$consumo_por_semana[$i] = [
+				'electricidad' => $consumo_comparativo_electricidad,
+				'agua' => $consumo_comparativo_agua,
+			];
+		}
+		return view('ui.weekly', compact('consumo_por_semana'));
 	}
 	
   public function monthly()
@@ -100,8 +98,6 @@ class UIController extends Controller
 		$consumo_por_hora_agua = $this->getConsumoPorHora(2, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para agua: 2
 		return view('ui.currentday', compact('consumo_por_hora_electricidad', 'consumo_por_hora_agua'));
 	}
-
-	  
 	private function getConsumoPorHora($id_tipo_sensor, $fecha)
 	{
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
@@ -118,7 +114,6 @@ class UIController extends Controller
 		}
 		return $consumo_por_hora;
 	}
-	
 	private function getConsumoDelDia($id_tipo_sensor, $fecha_relativa)
 	{
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
@@ -171,26 +166,22 @@ class UIController extends Controller
 
 	private function getConsumoDeLaSemana($id_tipo_sensor, $fecha)
 	{
-		$date = date_create($fecha);
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
-		$consumo_semanal = DB::table('measurements')
-		->select(DB::raw('SUM(consumo)'))
-		->whereIn('id_sensor', collect($sensor_type)->pluck('id_sensor')->toArray())
-		->whereBetween("fecha",[date_diff($date, ), $fecha])
-		->pluck('SUM(consumo)')
-		->toArray()[0];
-		return $consumo_semanal;
-	}
-
-
-	private function calcularPorcentaje($valor_actual, $valor_anterior)
-	{
-		if ($valor_anterior == 0) 
-			return 0; // Evitar división por cero
-		return (($valor_actual - $valor_anterior) / $valor_anterior) * 100;
+		$first_fecha = DB::select("SELECT DISTINCT fecha AS closest_monday FROM measurements WHERE HOUR(fecha) = 0 
+		AND DATE(fecha) = (SELECT MAX(DATE(fecha)) FROM measurements WHERE fecha < ? AND DAYOFWEEK(fecha) 
+		= 2)", [$fecha])[0]->closest_monday;
+		$last_fecha = DB::select("SELECT DISTINCT fecha FROM measurements WHERE DATE(fecha) = ? 
+		ORDER BY fecha DESC LIMIT 1", [$fecha])[0]->fecha;
+		$datos_consumo = DB::table("measurements")->select(DB::raw("consumo"))
+		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
+		->whereIn("fecha", function ($query) use ($first_fecha, $last_fecha) {
+			$query->select("fecha")->from("measurements")
+			->where("fecha", "=", $first_fecha)
+			->orWhere("fecha", "=", $last_fecha);
+		})
+		->orderBy("consumo")
+		->pluck("consumo")
+		->toArray();
+		return $datos_consumo[1] - $datos_consumo[0];
 	}
 }
-
-
-
-
