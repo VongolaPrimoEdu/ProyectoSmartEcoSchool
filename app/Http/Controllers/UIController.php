@@ -22,14 +22,16 @@ class UIController extends Controller
 	{
     // Arreglo para almacenar los datos de consumo por día de la semana
     $consumo_por_dia = [];
+		$consumo_actual_electricidad = $this->getConsumoDelDia(1, $this->fecha_aleatoria);
+		$consumo_actual_agua = $this->getConsumoDelDia(2, $this->fecha_aleatoria);
     // Recorrer los últimos 7 días
     for ($i = 7; $i > 0; $i--) {
         // Obtener la fecha para el día actual menos $i días
 				$fecha_reducida = $this->fecha_aleatoria->copy()->subDays($i);
         $fecha = $fecha_reducida->toDateString();
         // Obtener el consumo del día actual con respecto al de hace $i días
-        $consumo_diario_electricidad = $this->getConsumoDelDia(1, $fecha); // Tipo de sensor para electricidad: 1
-        $consumo_diario_agua = $this->getConsumoDelDia(2, $fecha); // Tipo de sensor para agua: 2
+        $consumo_diario_electricidad = $consumo_actual_electricidad - $this->getConsumoDelDia(1, $fecha); // Tipo de sensor para electricidad: 1
+        $consumo_diario_agua = $consumo_actual_agua - $this->getConsumoDelDia(2, $fecha); // Tipo de sensor para agua: 2
         // Almacenar los datos en el arreglo por día de la semana
         $dia_semana = $fecha_reducida->dayName;
         $consumo_por_dia[$dia_semana] = [
@@ -131,33 +133,21 @@ class UIController extends Controller
 	{
 		//Consulta que almacena en un array el tipo de sensor pasado como parámetro.
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
-		// Recoger la última medida del día de la fecha pasado como parámetro
-		$ultimo_registro_dia_previo = DB::table("measurements")->select(DB::raw("consumo"))
+		// Recoger la última medida del día de la fecha pasada como parámetro
+		$ultimo_registro_dia = DB::table("measurements")->select(DB::raw("consumo"))
 		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())->
 		whereRaw("DATE(fecha) = ?", [$fecha])->orderByDesc("consumo")->limit(1)->pluck("consumo")
 		->get(0);
-		// Recoger la primera medida del día de la fecha pasado como parámetro
-		$primer_registro_dia_previo = DB::table("measurements")->select(DB::raw("consumo"))
+		// Recoger la primera medida del día de la fecha pasada como parámetro
+		$primer_registro_dia = DB::table("measurements")->select(DB::raw("consumo"))
 		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())->
 		whereRaw("DATE(fecha) = ?", [$fecha])->orderBy("consumo")->limit(1)->pluck("consumo")
 		->get(0);
-		// Recoger la última medida del día actual.
-		$ultimo_registro_dia_actual = DB::table("measurements")->select(DB::raw("consumo"))
-		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
-		->whereRaw("DATE(fecha) = ?", [$this->fecha_aleatoria->toDateString()])->orderByDesc("consumo")
-		->limit(1)->pluck("consumo")->get(0);
-		// Recoger la primera medida del día actual.
-		$primer_registro_dia_actual = DB::table("measurements")->select(DB::raw("consumo"))
-		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
-		->whereRaw("DATE(fecha) = ?", [$this->fecha_aleatoria->toDateString()])->orderBy("consumo")
-		->limit(1)->pluck("consumo")->get(0);
 		/*
 		La resta entre el último y primer registro de los respectivos días da como resultado el consumo real 
 		de esos días.
 		*/
-		$consumo_dia_actual = $ultimo_registro_dia_actual - $primer_registro_dia_actual;
-		$consumo_dia_previo = $ultimo_registro_dia_previo - $primer_registro_dia_previo;
-		return $consumo_dia_actual - $consumo_dia_previo;
+		return $ultimo_registro_dia - $primer_registro_dia;
 	}
 
 	private function getConsumoDeLaSemana($id_tipo_sensor, $fecha)
