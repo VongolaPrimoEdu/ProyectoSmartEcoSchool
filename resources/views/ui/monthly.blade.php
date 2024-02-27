@@ -85,5 +85,5 @@
 }
 @endsection
 @section("next-location", route("ui.currentday"))
-@section("time",20000)
+@section("time",15000)
 @section("viewforimage","monthly")
