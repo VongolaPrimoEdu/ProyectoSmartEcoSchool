@@ -137,16 +137,14 @@ class UIController extends Controller
 	{
 		//Consulta que almacena en un array el tipo de sensor pasado como parámetro.
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
-		// Recoger la última medida del día de la fecha pasada como parámetro
-		$ultimo_registro_dia = DB::table("measurements")->select(DB::raw("consumo"))
-		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())->
-		whereRaw("DATE(fecha) = ?", [$fecha])->orderByDesc("consumo")->limit(1)->pluck("consumo")
-		->get(0);
-		// Recoger la primera medida del día de la fecha pasada como parámetro
-		$primer_registro_dia = DB::table("measurements")->select(DB::raw("consumo"))
-		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())->
-		whereRaw("DATE(fecha) = ?", [$fecha])->orderBy("consumo")->limit(1)->pluck("consumo")
-		->get(0);
+		// Recoger las medidas del día de la fecha pasada como parámetro
+		$query = DB::table("measurements")->select(DB::raw("consumo"))
+		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
+		->whereRaw("DATE(fecha) = ?", [$fecha])->orderBy("consumo")->pluck("consumo");
+		//Recoger la última medida.
+		$ultimo_registro_dia = $query->get($query->count() - 1);
+		//Recoger la primera medida.
+		$primer_registro_dia = $query->get(0);
 		/*
 		La resta entre el último y primer registro de los respectivos días da como resultado el consumo real 
 		de esos días.
