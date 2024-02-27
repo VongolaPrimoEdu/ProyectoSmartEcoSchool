@@ -38,9 +38,12 @@
 	</main>
 	<script type="module">
 		import  { drawElecChart,drawWaterChart }  from "./js/charts.js";
+		//Se dibujan las gráficas por medio de objetos.
 		drawWaterChart(@yield("objwater"));
 		drawElecChart(@yield("objelec"));
+		//Cambio de vista en un tiempo determinado.
 	  setTimeout(() => location.href = "@yield("next-location")", @yield("time"));
+		//Inserción de flecha debajo de un punto concreto de la timeline.
 		document.getElementById("@yield("viewforimage")").insertAdjacentHTML("beforeend",
 		"<img src='{{asset('img/icons/arrow.svg')}}' id='arrow' alt='Flecha apuntando hacia arriba'>");
 	</script>
