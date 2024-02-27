@@ -22,6 +22,7 @@ class UIController extends Controller
 	{
     // Arreglo para almacenar los datos de consumo por día de la semana
     $consumo_por_dia = [];
+		//Recoge el consumo del día de hoy.
 		$consumo_actual_electricidad = $this->getConsumoDelDia(1, $this->fecha_aleatoria);
 		$consumo_actual_agua = $this->getConsumoDelDia(2, $this->fecha_aleatoria);
     // Recorrer los últimos 7 días
@@ -44,7 +45,7 @@ class UIController extends Controller
 	
   public function weekly()
 	{
-		//Cantidades de agua y electricidad consumidas a lo largo de la semana del día actual.
+		//Consumo a lo largo de la semana del día actual.
 		$consumo_actual_electricidad = $this->getConsumoDeLaSemana(1, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para electricidad: 1
 		$consumo_actual_agua = $this->getConsumoDeLaSemana(2, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para agua: 2
 		//Recoge el domingo anterior más próximo al día actual, para partir de ahí en la comparación semanal.
@@ -80,11 +81,14 @@ class UIController extends Controller
 		//Recoge el mes y el año actuales.
 		$mes = $this->fecha_aleatoria->month;
 		$anio = $this->fecha_aleatoria->year;
+		//Recoge el consumo del mes actual.
+		$consumo_actual_electricidad = $this->getConsumoDelMes(1, $anio, $mes);
+		$consumo_actual_agua = $this->getConsumoDelMes(2, $anio, $mes);
 		//Recorrer todos los meses del año actual.
 		for ($i = 1; $i < $mes; $i++){
 			//Obtener el consumo del mes actual con respecto al del mes previo ($i).
-			$consumo_mensual_electricidad = $this->getConsumoDelMes(1, $anio, $i);
-			$consumo_mensual_agua = $this->getConsumoDelMes(2, $anio, $i);
+			$consumo_mensual_electricidad = $consumo_actual_electricidad - $this->getConsumoDelMes(1, $anio, $i);
+			$consumo_mensual_agua = $consumo_actual_agua - $this->getConsumoDelMes(2, $anio, $i);
 			// Almacenar el consumo en el arreglo.
 			$consumo_por_mes[$i - 1] = [
 				'electricidad' => $consumo_mensual_electricidad,
@@ -158,10 +162,7 @@ class UIController extends Controller
 		$first_fecha = DB::select("SELECT DISTINCT fecha AS closest_monday FROM measurements WHERE HOUR(fecha) = 0 
 		AND DATE(fecha) = (SELECT MAX(DATE(fecha)) FROM measurements WHERE fecha < ? AND DAYOFWEEK(fecha) 
 		= 2)", [$fecha])[0]->closest_monday;
-		/* 
-		Recoger el último registro correspondiente a la fecha pasada como parámetro 
-		(necesario porque hay que considerar la última hora de registro del día actual).
-		*/ 
+		// Recoger el último registro correspondiente a la fecha pasada como parámetro (la última medición de ese día).
 		$last_fecha = DB::select("SELECT DISTINCT fecha FROM measurements WHERE DATE(fecha) = ? 
 		ORDER BY fecha DESC LIMIT 1", [$fecha])[0]->fecha;
 		//Recoger los dos consumos correspondientes a las fechas última y primera para luego devolver la diferencia.
@@ -183,34 +184,20 @@ class UIController extends Controller
 		//Consulta que almacena en un array el tipo de sensor pasado como parámetro.
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
 		// Recoger la primera medida del mes pasado como parámetro (teniendo en cuenta el año).
-		$primer_registro_mes_previo = DB::table("measurements")->select(DB::raw("consumo"))
+		$primer_registro_mes = DB::table("measurements")->select(DB::raw("consumo"))
 		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
 		->whereYear("fecha", "=", $anio)->whereMonth("fecha", "=", $mes)->orderBy("consumo")->limit(1)
 		->pluck("consumo")->get(0);
 		// Recoger la última medida del mes pasado como parámetro (teniendo en cuenta el año).
-		$ultimo_registro_mes_previo = DB::table("measurements")->select(DB::raw("consumo"))
+		$ultimo_registro_mes = DB::table("measurements")->select(DB::raw("consumo"))
 		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
 		->whereYear("fecha", "=", $anio)->whereMonth("fecha", "=", $mes)->orderByDesc("consumo")->limit(1)
-		->pluck("consumo")->get(0);
-		// Recoger la primera medida del mes actual (teniendo en cuenta el año).
-		$primer_registro_mes_actual = DB::table("measurements")->select(DB::raw("consumo"))
-		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
-		->whereYear("fecha", "=", $this->fecha_aleatoria->year)
-		->whereMonth("fecha", "=", $this->fecha_aleatoria->month)->orderBy("consumo")->limit(1)
-		->pluck("consumo")->get(0);
-		// Recoger la última medida del mes actual (teniendo en cuenta el año).
-		$ultimo_registro_mes_actual = DB::table("measurements")->select(DB::raw("consumo"))
-		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
-		->whereYear("fecha", "=", $this->fecha_aleatoria->year)
-		->whereMonth("fecha", "=", $this->fecha_aleatoria->month)->orderByDesc("consumo")->limit(1)
 		->pluck("consumo")->get(0);
 		/*
 		La resta entre el último y primer registro de los respectivos meses da como resultado el consumo real 
 		de esos meses.
 		*/
-		$consumo_mes_actual = $ultimo_registro_mes_actual - $primer_registro_mes_actual;
-		$consumo_mes_previo = $ultimo_registro_mes_previo - $primer_registro_mes_previo;
-		return $consumo_mes_actual - $consumo_mes_previo;
+		return $ultimo_registro_mes - $primer_registro_mes;
 	}
 
 }
