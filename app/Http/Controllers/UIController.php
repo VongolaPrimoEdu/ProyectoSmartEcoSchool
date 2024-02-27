@@ -181,16 +181,15 @@ class UIController extends Controller
 	{
 		//Consulta que almacena en un array el tipo de sensor pasado como parámetro.
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
-		// Recoger la primera medida del mes pasado como parámetro (teniendo en cuenta el año).
-		$primer_registro_mes = DB::table("measurements")->select(DB::raw("consumo"))
+		// Recoger las medidas del mes pasado como parámetro (teniendo en cuenta el año).
+		$query = DB::table("measurements")->select(DB::raw("consumo"))
 		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
-		->whereYear("fecha", "=", $anio)->whereMonth("fecha", "=", $mes)->orderBy("consumo")->limit(1)
-		->pluck("consumo")->get(0);
-		// Recoger la última medida del mes pasado como parámetro (teniendo en cuenta el año).
-		$ultimo_registro_mes = DB::table("measurements")->select(DB::raw("consumo"))
-		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
-		->whereYear("fecha", "=", $anio)->whereMonth("fecha", "=", $mes)->orderByDesc("consumo")->limit(1)
-		->pluck("consumo")->get(0);
+		->whereYear("fecha", "=", $anio)->whereMonth("fecha", "=", $mes)->orderBy("consumo")
+		->pluck("consumo");
+		// Recoger la primera medida.
+		$primer_registro_mes = $query->get(0);
+		// Recoger la última medida.
+		$ultimo_registro_mes = $query->get($query->count() - 1);
 		/*
 		La resta entre el último y primer registro de los respectivos meses da como resultado el consumo real 
 		de esos meses.
