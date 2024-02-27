@@ -49,8 +49,8 @@ class UIController extends Controller
 		$consumo_actual_electricidad = $this->getConsumoDeLaSemana(1, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para electricidad: 1
 		$consumo_actual_agua = $this->getConsumoDeLaSemana(2, $this->fecha_aleatoria->toDateString()); // Tipo de sensor para agua: 2
 		//Recoge el domingo anterior más próximo al día actual, para partir de ahí en la comparación semanal.
-		$fecha_inicial_comparacion = DB::select("SELECT MAX(DATE(fecha)) as fecha FROM measurements
-		WHERE fecha < ? AND DAYOFWEEK(fecha) = 1", [$this->fecha_aleatoria])[0]->fecha;
+		$fecha_inicial_comparacion = DB::select("SELECT MAX(DATE(fecha)) as fecha FROM measurements WHERE fecha < ? 
+		AND DAYOFWEEK(fecha) = 1", [$this->fecha_aleatoria])[0]->fecha;
 		/* 
 			Recoge el año, el mes y el día del domingo previamente recogido, para incluirlos en un objeto Carbon que 
 			nos permita substraer días cómodamente.
@@ -138,13 +138,17 @@ class UIController extends Controller
 		//Consulta que almacena en un array el tipo de sensor pasado como parámetro.
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
 		// Recoger las medidas del día de la fecha pasada como parámetro
-		$query = DB::table("measurements")->select(DB::raw("consumo"))
+		$query = DB::table("measurements")
+		->select(DB::raw("consumo"))
 		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
-		->whereRaw("DATE(fecha) = ?", [$fecha])->orderBy("consumo")->pluck("consumo");
+		->whereRaw("DATE(fecha) = ?", [$fecha])
+		->orderBy("consumo")
+		->pluck("consumo")
+		->toArray();
 		//Recoger la última medida.
-		$ultimo_registro_dia = $query->get($query->count() - 1);
+		$ultimo_registro_dia = $query[sizeof($query) - 1];
 		//Recoger la primera medida.
-		$primer_registro_dia = $query->get(0);
+		$primer_registro_dia = $query[0];
 		/*
 		La resta entre el último y primer registro de los respectivos días da como resultado el consumo real 
 		de esos días.
@@ -164,10 +168,13 @@ class UIController extends Controller
 		$last_fecha = DB::select("SELECT DISTINCT fecha FROM measurements WHERE DATE(fecha) = ? 
 		ORDER BY fecha DESC LIMIT 1", [$fecha])[0]->fecha;
 		//Recoger los dos consumos correspondientes a las fechas última y primera para luego devolver la diferencia.
-		$datos_consumo = DB::table("measurements")->select(DB::raw("consumo"))
+		$datos_consumo = DB::table("measurements")
+		->select(DB::raw("consumo"))
 		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
 		->whereIn("fecha", function ($query) use ($first_fecha, $last_fecha) {
-			$query->select("fecha")->from("measurements")
+			$query->
+			select("fecha")
+			->from("measurements")
 			->where("fecha", "=", $first_fecha)
 			->orWhere("fecha", "=", $last_fecha);
 		})
@@ -182,14 +189,18 @@ class UIController extends Controller
 		//Consulta que almacena en un array el tipo de sensor pasado como parámetro.
 		$sensor_type = DB::select("SELECT id_sensor FROM sensors WHERE id_type=$id_tipo_sensor");
 		// Recoger las medidas del mes pasado como parámetro (teniendo en cuenta el año).
-		$query = DB::table("measurements")->select(DB::raw("consumo"))
+		$query = DB::table("measurements")
+		->select(DB::raw("consumo"))
 		->whereIn("id_sensor", collect($sensor_type)->pluck("id_sensor")->toArray())
-		->whereYear("fecha", "=", $anio)->whereMonth("fecha", "=", $mes)->orderBy("consumo")
-		->pluck("consumo");
+		->whereYear("fecha", "=", $anio)
+		->whereMonth("fecha", "=", $mes)
+		->orderBy("consumo")
+		->pluck("consumo")
+		->toArray();
 		// Recoger la primera medida.
-		$primer_registro_mes = $query->get(0);
+		$primer_registro_mes = $query[0];
 		// Recoger la última medida.
-		$ultimo_registro_mes = $query->get($query->count() - 1);
+		$ultimo_registro_mes = $query[sizeof($query) - 1];
 		/*
 		La resta entre el último y primer registro de los respectivos meses da como resultado el consumo real 
 		de esos meses.
