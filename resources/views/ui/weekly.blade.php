@@ -18,6 +18,28 @@
 				backgroundColor: 'rgba(0,0,255,0.5)'
 			}
 		]
+	},
+	options : {
+		scales: {
+			y: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 20
+						}
+				}
+			},
+			x: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 18
+						}
+				}
+			}
+		}
 	}
 }
 @endsection
@@ -38,6 +60,28 @@
 				backgroundColor: 'rgba(143,143,0,0.5)'
 			}
 		]
+	},
+	options : {
+		scales: {
+			y: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 20
+						}
+				}
+			},
+			x: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 18
+						}
+				}
+			}
+		}
 	}
 }
 @endsection

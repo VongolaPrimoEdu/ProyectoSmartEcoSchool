@@ -6,6 +6,7 @@ body {
 }
 /* || HEADER */
 header {
+	margin-top : -1em;
 	display: grid;
 	grid-template-columns: 0.3fr 1fr;
 	align-items: center;
@@ -64,6 +65,9 @@ main {
 /* Centrado de los contenidos principales */
 main > * {
 	margin: 0 auto;
+}
+main > p {
+	font-size: 1.5rem;
 }
 /* Iconos de color negro */
 .icon {

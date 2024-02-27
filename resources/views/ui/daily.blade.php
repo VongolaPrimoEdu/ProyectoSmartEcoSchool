@@ -5,7 +5,7 @@
 {
 	type: 'line',
 	data: {
-		labels: ['Hace 7 días','Hace 6 días','Hace 5 días','Hace 4 días','Hace 3 días','Hace 2 días','Hace 1 día'],
+		labels: ['7 días','6 días','5 días','4 días','3 días','2 días','1 día'],
 		datasets: [
 			{
 				label: "",
@@ -14,18 +14,39 @@
 						{{$consumo_dia["agua"]}},
 					@endforeach
 				],
-				borderColor: 'rgb(0,0,255)',
-				backgroundColor: 'rgba(0,0,255,0.5)'
+				borderColor: 'rgb(0,0,255)'
 			}
 		]
+	},
+	options : {
+		scales: {
+			y: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 20
+						}
+				}
+			},
+			x: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 18
+						}
+				}
+			}
+		}
+		}
 	}
-}
 @endsection
 @section("objelec")
 {
 	type: 'line',
 	data: {
-		labels: ['Hace 7 días','Hace 6 días','Hace 5 días','Hace 4 días','Hace 3 días','Hace 2 días','Hace 1 día'],
+		labels: ['7 días','6 días','5 días','4 días','3 días','2 días','1 día'],
 		datasets: [
 			{
 				label: "",
@@ -34,10 +55,31 @@
 						{{$consumo_dia["electricidad"]}},
 					@endforeach
 				],
-				borderColor: 'rgb(143,143,0)',
-				backgroundColor: 'rgba(143,143,0,0.5)'
+				borderColor: 'rgb(143,143,0)'
 			}
 		]
+	},
+	options : {
+		scales: {
+			y: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 20
+						}
+				}
+			},
+			x: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 18
+						}
+				}
+			}
+		}
 	}
 }
 @endsection

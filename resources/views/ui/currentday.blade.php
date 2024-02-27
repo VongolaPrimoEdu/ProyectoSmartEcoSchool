@@ -23,6 +23,26 @@
 		]
 	},
 	options: {
+		scales: {
+			y: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 20
+						}
+				}
+			},
+			x: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 18
+						}
+				}
+			}
+		},
 		elements: {
 			line: {
 				fill: true,
@@ -54,6 +74,26 @@
 		]
 	},
 	options: {
+		scales: {
+			y: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 20
+						}
+				}
+			},
+			x: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 18
+						}
+				}
+			}
+		},
 		elements: {
 			line: {
 				fill: true,

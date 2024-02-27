@@ -17,6 +17,28 @@
         label: ""
 			}
 		]
+	},
+	options : {
+		scales: {
+			y: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 20
+						}
+				}
+			},
+			x: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 18
+						}
+				}
+			}
+		}
 	}
 }
 @endsection
@@ -37,6 +59,28 @@
 				backgroundColor: 'rgb(143,143,0)'
 			}
 		]
+	},
+	options : {
+		scales: {
+			y: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 20
+						}
+				}
+			},
+			x: {
+				ticks: {
+						color: 'black',
+						font: {
+							weight: 'bold',
+							size: 18
+						}
+				}
+			}
+		}
 	}
 }
 @endsection
